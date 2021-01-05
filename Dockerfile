@@ -1,4 +1,4 @@
-FROM amd64/debian:buster
+FROM amd64/debian:buster-slim
 
 ARG version="1.0.0"
 ARG USER=factorio
