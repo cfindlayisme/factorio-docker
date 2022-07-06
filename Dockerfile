@@ -1,6 +1,6 @@
 FROM amd64/debian:buster-slim
 
-ARG version="1.1.53"
+ARG version="1.1.61"
 ARG USER=factorio
 ARG GROUP=factorio
 ARG PUID=845
