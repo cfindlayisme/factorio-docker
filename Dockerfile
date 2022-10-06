@@ -20,6 +20,8 @@ RUN \
  adduser --home /config --system --uid "$PUID" --ingroup "$GROUP" --shell /bin/sh "$USER" && \
  chown -R ${USER}:${GROUP} /config /factorio && \
  echo "**** Cleanup ****" && \
+ apt remove -y xz-utils && \
+ apt clean && \
  rm -rf \
 	/tmp/* 
 
