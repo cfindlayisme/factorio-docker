@@ -24,7 +24,7 @@ gcloud auth activate-service-account --key-file=/config/gcs-key.json
 # Check for server settings - and exit if we cannot get it
 if [ ! -f /config/server-settings.json ]; then
     if gsutil cp gs://$GCS_BUCKET$GCS_BUCKET_PATH/server-settings.json /config/server-settings.json; then
-        echo "Grabbed config from GCS bucket since it did not exist locally!"
+        echo "Grabbed server-settings.json from GCS bucket since it did not exist locally!"
     else
         echo "No server-settings.json file present here or in cloud bucket. Exiting!"
         exit 1
@@ -34,7 +34,7 @@ fi
 # Check for world
 if [ ! -f /config/world.zip ]; then
     if gsutil cp gs://$GCS_BUCKET$GCS_BUCKET_PATH/world.zip /config/world.zip; then
-        echo "Grabbed config from GCS bucket since it did not exist locally!"
+        echo "Grabbed world.zip from GCS bucket since it did not exist locally!"
     else
         echo "world.zip does not exist locally or in the bucket. One is needed for factorio, so exiting!"
         exit 1
