@@ -5,3 +5,5 @@ You simply need to mount the volume /config and put two files in it:
 - server-settings.json
 
 It was written with cloud providers in mind to save me time deploying a server each time I decide to play a bit.
+
+RCON_PORT and RCON_PASSWORD need to be set in the enviorment variables

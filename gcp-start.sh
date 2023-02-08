@@ -42,7 +42,7 @@ if [ ! -f /config/world.zip ]; then
 fi
 
 # Start terrara
-if /factorio/bin/x64/factorio --server-settings /config/server-settings.json --start-server /config/world.zip; then
+if /factorio/bin/x64/factorio --server-settings /config/server-settings.json --start-server /config/world.zip --rcon-port $RCON_PORT --rcon-password "$RCON_PASSWORD"; then
     # Copy over to GCS once done
     gsutil cp /config/world.zip gs://$GCS_BUCKET$GCS_BUCKET_PATH/world.zip
     gsutil cp /config/server-settings.json gs://$GCS_BUCKET$GCS_BUCKET_PATH/server-settings.json
