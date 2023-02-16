@@ -1,0 +1,20 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image for factorio-docker
+      run: docker build . --file Dockerfile --tag cfindlayisme/factorio-docker:latest
+    - name: Build the image for factorio-docker-gcp
+      run: docker build . --file Dockerfile-GCP --tag cfindlayisme/factorio-docker-gcp:latest
