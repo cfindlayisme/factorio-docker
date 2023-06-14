@@ -2,7 +2,7 @@
 # License: LGPL v3.0
 FROM amd64/debian:bullseye-slim
 
-ARG version="1.1.76"
+ARG version="1.1.82"
 
 ADD "https://factorio.com/get-download/${version}/headless/linux64" /tmp/factorio.tar.xz
 
