@@ -1,6 +1,6 @@
 # Author: Chuck Findlay <chuck@findlayis.me>
 # License: LGPL v3.0
-FROM amd64/debian:bullseye-slim
+FROM amd64/debian:bookworm-slim
 
 ARG version="1.1.87"
 
