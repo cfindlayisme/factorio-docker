@@ -1,7 +1,7 @@
 # Author: Chuck Findlay <chuck@findlayis.me>
 # License: LGPL v3.0
 
-FROM cfindlayisme/factorio-docker:latest
+FROM gitea.findlayis.me/chuck/factorio-docker:latest
 
 RUN \
     apt update && \
