@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+
+  factoriogcp:
+    image: gitea.findlayis.me/chuck/factorio-docker-gcp:latest
+    container_name: factoriogcp
+    ports:
+      - "34197:34197/udp"
+      - "25575:25575"
+    restart: unless-stopped
+    volumes:
+      - /srv/factorio/data:/config
+    environment:
+      GCS_BUCKET: "bucket"
+      GCS_BUCKET_PATH: "/factorio"
+      RCON_PORT: "25575"
+      RCON_PASSWORD: "therconpassword"
