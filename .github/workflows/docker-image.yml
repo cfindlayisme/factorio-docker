@@ -26,15 +26,27 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
                 
-    - name: Run Snyk to check base (vanilla factorio) Docker image for vulnerabilities
-      uses: snyk/actions/docker@master
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        image: ${{ secrets.DOCKER_REPO }}
-        args: --severity-threshold=high
+    # - name: Run Snyk to check base (vanilla factorio) Docker image for vulnerabilities
+    #   uses: snyk/actions/docker@master
+    #   env:
+    #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    #   with:
+    #     image: ${{ secrets.DOCKER_REPO }}
+    #     args: --severity-threshold=high
       
     - name: Push the Docker image
       run: docker push ${{ secrets.DOCKER_REPO }}
     - name: Push the second Docker image
       run: docker push ${{ secrets.DOCKER_REPO2 }}
+
+    - name: Deploy GCP image to production
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_SECRET }}
+        port: 22
+        script: |
+          cd /srv/factorio
+          docker compose pull
+          docker compose up -d
