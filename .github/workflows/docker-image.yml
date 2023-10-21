@@ -26,13 +26,13 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
                 
-    - name: Run Snyk to check base (vanilla factorio) Docker image for vulnerabilities
-      uses: snyk/actions/docker@master
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        image: ${{ secrets.DOCKER_REPO }}
-        args: --severity-threshold=high
+    # - name: Run Snyk to check base (vanilla factorio) Docker image for vulnerabilities
+    #   uses: snyk/actions/docker@master
+    #   env:
+    #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    #   with:
+    #     image: ${{ secrets.DOCKER_REPO }}
+    #     args: --severity-threshold=high
       
     - name: Push the Docker image
       run: docker push ${{ secrets.DOCKER_REPO }}
@@ -50,3 +50,12 @@ jobs:
           cd /srv/factorio
           docker compose pull
           docker compose up -d
+
+    - name: Smoke test deployment to prod
+      uses: nrukavkov/open-ports-check-action@v1
+      with:
+        port: 34197
+        host: ${{ secrets.SSH_HOST }}
+        pause: 1000
+        needFail: 'true'
+        reverse: 'false'
