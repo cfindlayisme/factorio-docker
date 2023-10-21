@@ -54,7 +54,7 @@ jobs:
     - name: Smoke test deployment to prod
       uses: nrukavkov/open-ports-check-action@v1
       with:
-        port: 34197
+        port: 25575
         host: ${{ secrets.SSH_HOST }}
         pause: 1000
         needFail: 'true'
