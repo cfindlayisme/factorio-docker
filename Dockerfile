@@ -6,10 +6,10 @@ ARG version="1.1.91"
 
 ADD "https://factorio.com/get-download/${version}/headless/linux64" /tmp/factorio.tar.xz
 
+WORKDIR /
 RUN \
- cd / && \
- apt update && \
- apt install -y xz-utils && \
+ apt-get update && \
+ apt-get install -y xz-utils && \
  tar -xvf /tmp/factorio.tar.xz && \
  chmod +x /factorio/bin/x64/factorio
 
