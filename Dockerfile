@@ -9,7 +9,7 @@ ADD "https://factorio.com/get-download/${version}/headless/linux64" /tmp/factori
 WORKDIR /
 RUN \
  apt-get update && \
- apt-get install -y xz-utils && \
+ apt-get install -y xz-utils=5.4.1-0.2 && \
  tar -xvf /tmp/factorio.tar.xz && \
  chmod +x /factorio/bin/x64/factorio
 
@@ -20,4 +20,4 @@ FROM amd64/debian:bookworm-slim
 
 COPY --from=builder /factorio /factorio
 
-CMD /factorio/bin/x64/factorio --server-settings /config/server-settings.json --start-server /config/world.zip
+CMD ["bash", "-c", "/factorio/bin/x64/factorio --server-settings /config/server-settings.json --start-server /config/world.zip"]
