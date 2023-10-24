@@ -8,6 +8,8 @@ RUN \
     apt-get install -y cron=3.0pl1-162 && \
     apt-get clean
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Install cloud SDK for GCS. This is large unfortunately
 # TODO: Find a way to make this far smaller (we only really need gsutil to copy)
 RUN \
