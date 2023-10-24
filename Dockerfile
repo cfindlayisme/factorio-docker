@@ -11,7 +11,8 @@ RUN \
  apt-get update && \
  apt-get install -y xz-utils=5.4.1-0.2 && \
  tar -xvf /tmp/factorio.tar.xz && \
- chmod +x /factorio/bin/x64/factorio
+ chmod +x /factorio/bin/x64/factorio && \
+ rm -rf /var/lib/apt/lists/*
 
 EXPOSE 34197/udp
 VOLUME ["/config"]
