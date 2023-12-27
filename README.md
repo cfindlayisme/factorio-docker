@@ -1,4 +1,4 @@
-This repo contains two docker images for factorio. One is a simple vanlla image, and the other contains a backup script that will backup the config and world regularly to a GCP bucket. Overall cost works to pennies per month CAD.
+This repository contains two docker images for factorio. One is a simple vanlla image, and the other contains a backup script that will backup the config and world regularly to a GCP bucket. Overall cost works to pennies per month CAD.
 
 ## Vanilla (Dockerfile)
 Mount the folder /config and put these two folders in it:
@@ -28,7 +28,7 @@ See docker-compose.yaml.sample for an example of this one in compose format.
 Change `ARG version="1.1.94"` in Dockerfile to the desired version, and then build.
 
 ## Building
-Built via Github Actions, but can be built locally with 
+Built via GitHub Actions, but can be built locally with 
 
 `docker build -t gitea.findlayis.me/chuck/factorio-docker:latest .` 
 
@@ -38,4 +38,4 @@ and then
 
 GCP image builds off the vanilla as base so vanilla needs to be built first.
 
-Github Actions builds and pushes to my private registry, and deploys my server for me via a simple `docker-compose up -d` command setup via ansible.
+GitHub Actions builds and pushes to my private registry, and deploys my server for me via a simple `docker-compose up -d` command setup via ansible.
