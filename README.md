@@ -8,6 +8,7 @@ Mount the folder /config and put these two folders in it:
 Forward ports 34197 UDP
 
 And run it.
+
 `docker run -p 34197:34197/udp -v /path/to/config:/config gitea.findlayis.me/chuck/factorio-docker:latest`
 
 ## GCP Image (Dockerfile-GCP)
@@ -28,8 +29,11 @@ Change `ARG version="1.1.94"` in Dockerfile to the desired version, and then bui
 
 ## Building
 Built via Github Actions, but can be built locally with 
+
 `docker build -t gitea.findlayis.me/chuck/factorio-docker:latest .` 
+
 and then 
+
 `docker build -t gitea.findlayis.me/chuck/factorio-docker-gcp:latest -f Dockerfile-GCP .`
 
 GCP image builds off the vanilla as base so vanilla needs to be built first.
