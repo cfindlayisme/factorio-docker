@@ -100,19 +100,27 @@ jobs:
           docker compose pull
           docker compose up -d
 
-    - name: Install irssi
-      run: sudo apt-get install -y irssi
+    - name: Get commit message
+      id: get_commit
+      run: |
+        echo "::set-output name=commit_message::$(git log -1 --pretty=%B)"
 
     - name: Notify IRC Success
-      run: |
-        COMMIT_MSG=$(git log -1 --pretty=%B)
-        irssi -c ${{ secrets.IRC_SERVER }} -n github_actions \
-        -channel '#${{ secrets.IRC_CHANNEL }}' -sendcmd "/msg #${{ secrets.IRC_CHANNEL }} Build of ${{ secrets.DOCKER_REPO }} & ${{ secrets.DOCKER_REPO2 }} completed successfully with commit message: $COMMIT_MSG; /quit"
+      uses: rectalogic/notify-irc@v1
       if: success()
+      with:
+        channel: "${{ secrets.IRC_CHANNEL }}"
+        server: "${{ secrets.IRC_SERVER }}"
+        nickname: gh-notifier
+        message: |
+          Build of ${{ secrets.DOCKER_REPO }} & ${{ secrets.DOCKER_REPO2 }} completed successfully with commit message: ${{ steps.get_commit.outputs.commit_message }}
 
     - name: Notify IRC Failure
-      run: |
-        COMMIT_MSG=$(git log -1 --pretty=%B)
-        irssi -c ${{ secrets.IRC_SERVER }} -n github_actions \
-        -channel '#${{ secrets.IRC_CHANNEL }}' -sendcmd "/msg #${{ secrets.IRC_CHANNEL }} Build of ${{ secrets.DOCKER_REPO }} & ${{ secrets.DOCKER_REPO2 }} failed with commit message: $COMMIT_MSG; /quit"
+      uses: rectalogic/notify-irc@v1
       if: failure()
+      with:
+        channel: "${{ secrets.IRC_CHANNEL }}"
+        server: "${{ secrets.IRC_SERVER }}"
+        nickname: gh-notifier
+        message: |
+          Build of ${{ secrets.DOCKER_REPO }} & ${{ secrets.DOCKER_REPO2 }} failed with commit message: ${{ steps.get_commit.outputs.commit_message }}
