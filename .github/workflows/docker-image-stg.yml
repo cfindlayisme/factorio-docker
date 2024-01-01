@@ -81,3 +81,20 @@ jobs:
       run: docker push ${{ secrets.DOCKER_REPO }}:${{ github.SHA }}-stg
     - name: Push the second Docker image with -stg tag
       run: docker push ${{ secrets.DOCKER_REPO2 }}:${{ github.SHA }}-stg
+
+    - name: Install irssi
+      run: sudo apt-get install -y irssi
+
+    - name: Notify IRC Success
+      run: |
+        COMMIT_MSG=$(git log -1 --pretty=%B)
+        irssi -c ${{ secrets.IRC_SERVER }} -n github_actions \
+        -channel '#${{ secrets.IRC_CHANNEL }}' -sendcmd "/msg #${{ secrets.IRC_CHANNEL }} Build of ${{ secrets.DOCKER_REPO }} & ${{ secrets.DOCKER_REPO2 }} completed successfully with commit message: $COMMIT_MSG; /quit"
+      if: success()
+
+    - name: Notify IRC Failure
+      run: |
+        COMMIT_MSG=$(git log -1 --pretty=%B)
+        irssi -c ${{ secrets.IRC_SERVER }} -n github_actions \
+        -channel '#${{ secrets.IRC_CHANNEL }}' -sendcmd "/msg #${{ secrets.IRC_CHANNEL }} Build of ${{ secrets.DOCKER_REPO }} & ${{ secrets.DOCKER_REPO2 }} failed with commit message: $COMMIT_MSG; /quit"
+      if: failure()
