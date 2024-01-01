@@ -82,17 +82,16 @@ jobs:
     - name: Push the second Docker image with -stg tag
       run: docker push ${{ secrets.DOCKER_REPO2 }}:${{ github.SHA }}-stg
 
-    - name: Install netcat
-      run: sudo apt-get install -y netcat
-
     - name: Notify IRC Success
       run: |
         COMMIT_MSG=$(git log -1 --pretty=%B)
-        (echo -e "USER github_actions 0 * :GitHub Actions\nNICK gh_act\nJOIN #${{ secrets.IRC_CHANNEL }}\nPRIVMSG #${{ secrets.IRC_CHANNEL }} :Build of ${{ secrets.DOCKER_REPO }} completed successfully with commit message: $COMMIT_MSG\nQUIT"; sleep 3) | nc ${{ secrets.IRC_SERVER }} 6667
+        NICK=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 9 ; echo '')
+        bash -c 'exec 3<>/dev/tcp/${{ secrets.IRC_SERVER }}/6667; echo -e "USER github_actions 0 * :GitHub Actions\nNICK $NICK\nJOIN #${{ secrets.IRC_CHANNEL }}" >&3; sleep 2; echo -e "PRIVMSG #${{ secrets.IRC_CHANNEL }} :Build of ${{ secrets.DOCKER_REPO }} completed successfully with commit message: $COMMIT_MSG\nQUIT" >&3; cat <&3'
       if: success()
 
     - name: Notify IRC Failure
       run: |
         COMMIT_MSG=$(git log -1 --pretty=%B)
-        (echo -e "USER github_actions 0 * :GitHub Actions\nNICK gh_act\nJOIN #${{ secrets.IRC_CHANNEL }}\nPRIVMSG #${{ secrets.IRC_CHANNEL }} :Build of ${{ secrets.DOCKER_REPO }} failed with commit message: $COMMIT_MSG\nQUIT"; sleep 3) | nc ${{ secrets.IRC_SERVER }} 6667
+        NICK=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 9 ; echo '')
+        bash -c 'exec 3<>/dev/tcp/${{ secrets.IRC_SERVER }}/6667; echo -e "USER github_actions 0 * :GitHub Actions\nNICK $NICK\nJOIN #${{ secrets.IRC_CHANNEL }}" >&3; sleep 2; echo -e "PRIVMSG #${{ secrets.IRC_CHANNEL }} :Build of ${{ secrets.DOCKER_REPO }} failed with commit message: $COMMIT_MSG\nQUIT" >&3; cat <&3'
       if: failure()
