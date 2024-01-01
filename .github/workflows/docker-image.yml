@@ -100,7 +100,7 @@ jobs:
           docker compose pull
           docker compose up -d
 
-     - name: Install irssi
+    - name: Install irssi
       run: sudo apt-get install -y irssi
 
     - name: Notify IRC Success
