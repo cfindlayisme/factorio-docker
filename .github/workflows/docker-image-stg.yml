@@ -82,27 +82,17 @@ jobs:
     - name: Push the second Docker image with -stg tag
       run: docker push ${{ secrets.DOCKER_REPO2 }}:${{ github.SHA }}-stg
 
-    - name: Get commit message
-      id: get_commit
-      run: |
-        echo "::set-output name=commit_message::$(git log -1 --pretty=%B)"
+    - name: Install netcat
+      run: sudo apt-get install -y netcat
 
     - name: Notify IRC Success
-      uses: rectalogic/notify-irc@v1
+      run: |
+        COMMIT_MSG=$(git log -1 --pretty=%B)
+        (echo -e "USER github_actions 0 * :GitHub Actions\nNICK gh_act\nJOIN #${{ secrets.IRC_CHANNEL }}\nPRIVMSG #${{ secrets.IRC_CHANNEL }} :Build of ${{ secrets.DOCKER_REPO }} completed successfully with commit message: $COMMIT_MSG\nQUIT"; sleep 3) | nc ${{ secrets.IRC_SERVER }} 6667
       if: success()
-      with:
-        channel: "${{ secrets.IRC_CHANNEL }}"
-        server: "${{ secrets.IRC_SERVER }}"
-        nickname: gh-notifier
-        message: |
-          Build of ${{ secrets.DOCKER_REPO }} & ${{ secrets.DOCKER_REPO2 }} completed successfully with commit message: ${{ steps.get_commit.outputs.commit_message }}
 
     - name: Notify IRC Failure
-      uses: rectalogic/notify-irc@v1
+      run: |
+        COMMIT_MSG=$(git log -1 --pretty=%B)
+        (echo -e "USER github_actions 0 * :GitHub Actions\nNICK gh_act\nJOIN #${{ secrets.IRC_CHANNEL }}\nPRIVMSG #${{ secrets.IRC_CHANNEL }} :Build of ${{ secrets.DOCKER_REPO }} failed with commit message: $COMMIT_MSG\nQUIT"; sleep 3) | nc ${{ secrets.IRC_SERVER }} 6667
       if: failure()
-      with:
-        channel: "${{ secrets.IRC_CHANNEL }}"
-        server: "${{ secrets.IRC_SERVER }}"
-        nickname: gh-notifier
-        message: |
-          Build of ${{ secrets.DOCKER_REPO }} & ${{ secrets.DOCKER_REPO2 }} failed with commit message: ${{ steps.get_commit.outputs.commit_message }}
