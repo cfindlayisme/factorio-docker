@@ -2,7 +2,7 @@
 # License: LGPL v3.0
 FROM amd64/debian:bookworm-slim AS builder
 
-ARG version="1.1.94"
+ARG version="1.1.101"
 
 ADD "https://factorio.com/get-download/${version}/headless/linux64" /tmp/factorio.tar.xz
 
