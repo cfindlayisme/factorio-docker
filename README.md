@@ -37,5 +37,3 @@ and then
 `docker build -t gitea.findlayis.me/chuck/factorio-docker-gcp:latest -f Dockerfile-GCP .`
 
 GCP image builds off the vanilla as base so vanilla needs to be built first.
-
-GitHub Actions builds and pushes to my private registry, and deploys my server for me via a simple `docker-compose up -d` command setup via ansible.
