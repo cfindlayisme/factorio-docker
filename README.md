@@ -18,7 +18,7 @@ Same as vanilla, but also set the following env variables:
 - RCON_PORT
 - RCON_PASSWORD
 
-And add gcs-key.json (key from Google Cloud Platform) to /config with access to write to the desired bucket. Backup will run every six hours, or on clean shutdown of the server.
+And add gcs-key.json (key from Google Cloud Platform) to /config with access to write to the desired bucket. Backup will run every hour, or on clean shutdown of the server.
 
 Forward $RCON_PORT (TCP) for RCON access.
 
