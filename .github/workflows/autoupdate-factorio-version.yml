@@ -27,9 +27,9 @@ jobs:
       - name: Check and update Dockerfile
         id: update
         run: |
-            CURRENT_VERSION=$(grep -oP '(?<=ARG version=").*(?=")' Dockerfile)
+            CURRENT_VERSION=$(grep -oP '(?<=ARG version=").*?(?=")' Dockerfile)
             if [ "$CURRENT_VERSION" != "${{ steps.fetch-version.outputs.version }}" ]; then
-                sed -i 's/ARG version=".*"/ARG version="'${{ steps.fetch-version.outputs.version }}'"/' Dockerfile
+                sed -i 's/ARG version=".*?"/ARG version="'${{ steps.fetch-version.outputs.version }}'"/' Dockerfile
                 echo "::set-output name=updated::true"
             fi
 
