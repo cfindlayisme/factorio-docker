@@ -13,11 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-    #   - name: Fetch latest stable version
-    #     id: fetch-version
-    #     run: |
-    #       VERSION=$(curl -s https://www.factorio.com/api/latest-releases | jq -r .stable.headless)
-    #       echo "::set-output name=version::$VERSION"
       - name: Fetch latest stable version
         id: fetch-version
         run: |
@@ -33,13 +28,6 @@ jobs:
                 echo "::set-output name=updated::true"
             fi
 
-      - name: Create new branch
-        run: |
-            git fetch origin
-            git checkout main
-            git checkout -b update-factorio-version-${{ steps.fetch-version.outputs.version }}
-            git push -f origin update-factorio-version-${{ steps.fetch-version.outputs.version }}
-            
       - name: Commit and push if Dockerfile was updated
         if: steps.update.outputs.updated == 'true'
         run: |
@@ -47,7 +35,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git add Dockerfile
           git commit -m "Update Factorio version to ${{ steps.fetch-version.outputs.version }}"
-          git push origin update-factorio-version-${{ steps.fetch-version.outputs.version }}
+          git push origin HEAD:refs/heads/update-factorio-version-${{ steps.fetch-version.outputs.version }}
 
       - name: Create Pull Request
         if: steps.update.outputs.updated == 'true'
