@@ -1,0 +1,67 @@
+name: Update Factorio Version
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # This will run the workflow every day at midnight
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+    #   - name: Fetch latest stable version
+    #     id: fetch-version
+    #     run: |
+    #       VERSION=$(curl -s https://www.factorio.com/api/latest-releases | jq -r .stable.headless)
+    #       echo "::set-output name=version::$VERSION"
+      - name: Fetch latest stable version
+        id: fetch-version
+        run: |
+            echo '{
+                "stable": {
+                    "headless": "1.0.0"
+                }
+            }' > mock.json
+            VERSION=$(jq -r .stable.headless mock.json)
+            echo "::set-output name=version::$VERSION"
+
+      - name: Check and update Dockerfile
+        id: update
+        run: |
+          CURRENT_VERSION=$(grep -oP '(?<=ARG version=").*(?=")' Dockerfile)
+          if [ "$CURRENT_VERSION" != "${{ steps.fetch-version.outputs.version }}" ]; then
+            sed -i 's/ARG version=".*"/ARG version="'${{ steps.fetch-version.outputs.version }}'"/' Dockerfile
+            echo "::set-output name=updated::true"
+          fi
+
+      - name: Create new branch
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const version = "${{ steps.fetch-version.outputs.version }}";
+            const branchName = 'update-factorio-version-' + version;
+            await github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/heads/' + branchName,
+              sha: context.sha
+            });
+
+      - name: Commit and push if Dockerfile was updated
+        if: steps.update.outputs.updated == 'true'
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add Dockerfile
+          git commit -m "Update Factorio version to ${{ steps.fetch-version.outputs.version }}"
+          git push origin update-factorio-version-${{ steps.fetch-version.outputs.version }}
+
+      - name: Create Pull Request
+        if: steps.update.outputs.updated == 'true'
+        uses: peter-evans/create-pull-request@v4
+        with:
+          title: "Update Factorio version to ${{ steps.fetch-version.outputs.version }}"
+          branch: "update-factorio-version-${{ steps.fetch-version.outputs.version }}"
