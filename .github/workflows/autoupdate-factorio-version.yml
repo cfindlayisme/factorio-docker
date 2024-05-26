@@ -41,9 +41,11 @@ jobs:
 
       - name: Create new branch
         run: |
+            git fetch origin
+            git checkout main
             git checkout -b update-factorio-version-${{ steps.fetch-version.outputs.version }}
             git push origin update-factorio-version-${{ steps.fetch-version.outputs.version }}
-
+            
       - name: Commit and push if Dockerfile was updated
         if: steps.update.outputs.updated == 'true'
         run: |
