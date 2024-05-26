@@ -40,17 +40,9 @@ jobs:
           fi
 
       - name: Create new branch
-        uses: actions/github-script@v5
-        with:
-          script: |
-            const version = "${{ steps.fetch-version.outputs.version }}";
-            const branchName = 'update-factorio-version-' + version;
-            await github.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/heads/' + branchName,
-              sha: context.sha
-            });
+        run: |
+            git checkout -b update-factorio-version-${{ steps.fetch-version.outputs.version }}
+            git push origin update-factorio-version-${{ steps.fetch-version.outputs.version }}
 
       - name: Commit and push if Dockerfile was updated
         if: steps.update.outputs.updated == 'true'
