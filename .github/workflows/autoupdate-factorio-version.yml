@@ -53,6 +53,7 @@ jobs:
         if: steps.update.outputs.updated == 'true'
         uses: peter-evans/create-pull-request@v4
         with:
-            title: "Update Factorio version to ${{ steps.fetch-version.outputs.version }}"
-            branch: "update-factorio-version-${{ steps.fetch-version.outputs.version }}"
-            base: "main"  # replace with your default branch if it's not "main"
+                title: "Update Factorio version to ${{ steps.fetch-version.outputs.version }}"
+                branch: "update-factorio-version-${{ steps.fetch-version.outputs.version }}"
+                base: "main"  # replace with your default branch if it's not "main"
+                body: "Automatically detected upstream version of factorio from developer's API"
