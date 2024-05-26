@@ -27,6 +27,8 @@ See docker-compose.yaml.sample for an example of this one in compose format.
 ## Updating
 Change `ARG version="1.1.94"` in Dockerfile to the desired version, and then build.
 
+There is a Github actions pipeline that will check daily for new versions and automatically open a PR if so to adjust this, so providing there is no PR open to do so whatever is in the `Dockerfile` should be the latest stable version.
+
 ## Building
 Built via GitHub Actions, but can be built locally with 
 
