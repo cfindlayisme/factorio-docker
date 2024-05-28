@@ -3,7 +3,7 @@ version: "3"
 services:
 
   factoriogcp:
-    image: gitea.findlayis.me/chuck/factorio-docker-gcp:latest
+    image: ghcr.io/cfindlayisme/factorio-docker:latest-gcp
     container_name: factoriogcp
     ports:
       - "34197:34197/udp"
