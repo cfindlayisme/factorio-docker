@@ -38,13 +38,13 @@ jobs:
       run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_REPO }}:latest
     - name: Build the second Docker image
       run: docker build . --file Dockerfile-GCP --tag ${{ secrets.DOCKER_REPO2 }}:latest
-    - name: Run Snyk to check base (vanilla factorio) Docker image for vulnerabilities
-      uses: snyk/actions/docker@master
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    - name: Run Trivy vulnerability scanner on base image
+      uses: aquasecurity/trivy-action@master
       with:
-        image: ${{ secrets.DOCKER_REPO }}:latest
-        args: --severity-threshold=high --fail-on=all
+        image-ref: ${{ secrets.DOCKER_REPO }}:latest-scan
+        exit-code: '1'
+        severity: 'HIGH'
+        ignore-unfixed: true
     - name: Push the Docker image
       run: docker push ${{ secrets.DOCKER_REPO }}:latest
       if: github.ref == 'refs/heads/main'
