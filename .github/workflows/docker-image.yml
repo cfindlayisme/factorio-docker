@@ -73,6 +73,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Extract factorio version
+      id: extract_version
+      run: |
+        VERSION=$(grep -oP 'ARG version="\K[^"]+' Dockerfile)
+        echo "::set-output name=version::$VERSION"
     - name: Set up Docker Buildx
       id: buildx
       uses: docker/setup-buildx-action@v3
@@ -89,17 +94,21 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_REPO }}:latest --tag ghcr.io/${{ github.repository }}:latest
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_REPO }}:latest --tag ${{ secrets.DOCKER_REPO }}:${{ steps.extract_version.outputs.version }} --tag ghcr.io/${{ github.repository }}:latest --tag ghcr.io/${{ github.repository }}:${{ steps.extract_version.outputs.version }}
     - name: Build the second Docker image
-      run: docker build . --file Dockerfile-GCP --tag ${{ secrets.DOCKER_REPO2 }}:latest --tag ghcr.io/${{ github.repository }}:gcp
+      run: docker build . --file Dockerfile-GCP --tag ${{ secrets.DOCKER_REPO2 }}:latest --tag ${{ secrets.DOCKER_REPO2 }}:${{ steps.extract_version.outputs.version }}-gcp --tag ghcr.io/${{ github.repository }}:gcp --tag ghcr.io/${{ github.repository }}:${{ steps.extract_version.outputs.version }}-gcp
     - name: Push the Docker image
       run: |
         docker push ${{ secrets.DOCKER_REPO }}:latest
+        docker push ${{ secrets.DOCKER_REPO }}:${{ steps.extract_version.outputs.version }}
         docker push ghcr.io/${{ github.repository }}:latest
+        docker push ghcr.io/${{ github.repository }}:${{ steps.extract_version.outputs.version }}
     - name: Push the second Docker image
       run: |
         docker push ${{ secrets.DOCKER_REPO2 }}:latest
+        docker push ${{ secrets.DOCKER_REPO2 }}:${{ steps.extract_version.outputs.version }}-gcp
         docker push ghcr.io/${{ github.repository }}:gcp
+        docker push ghcr.io/${{ github.repository }}:${{ steps.extract_version.outputs.version }}-gcp
     - name: Notify IRC Success
       run: |
         export COMMIT_MSG=$(git log -1 --pretty=%B)
