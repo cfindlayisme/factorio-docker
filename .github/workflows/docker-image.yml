@@ -18,7 +18,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  build:
+  build-and-scan:
     needs: [sonar]
 
     runs-on: ubuntu-latest
@@ -52,37 +52,53 @@ jobs:
         exit-code: '1'
         severity: 'HIGH'
         ignore-unfixed: true
-    - name: Push the Docker image
-      run: docker push ${{ secrets.DOCKER_REPO }}:latest
-      if: github.ref == 'refs/heads/main'
-    - name: Push the second Docker image
-      run: docker push ${{ secrets.DOCKER_REPO2 }}:latest
-      if: github.ref == 'refs/heads/main'
-    - name: Login to GitHub Packages
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Tag and push the first Docker image to GitHub Packages
-      run: |
-        docker tag ${{ secrets.DOCKER_REPO }}:latest ghcr.io/${{ github.repository }}:latest
-        docker push ghcr.io/${{ github.repository }}:latest
-      if: github.ref == 'refs/heads/main'
-    - name: Tag and push the second Docker image to GitHub Packages
-      run: |
-        docker tag ${{ secrets.DOCKER_REPO2 }}:latest ghcr.io/${{ github.repository }}:latest-gcp
-        docker push ghcr.io/${{ github.repository }}:latest-gcp
-      if: github.ref == 'refs/heads/main'
     - name: Notify IRC Success
       run: |
         export COMMIT_MSG=$(git log -1 --pretty=%B)
-        export MESSAGE="Build of ${{ secrets.DOCKER_REPO }}:latest and ${{ secrets.DOCKER_REPO2 }}:latest completed successfully with commit message: $COMMIT_MSG. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        export MESSAGE="Build and scan of ${{ secrets.DOCKER_REPO }}:latest and ${{ secrets.DOCKER_REPO2 }}:latest completed. Commit message: $COMMIT_MSG. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         curl -X POST -H "Content-Type: application/json" -d "{\"message\": \"$MESSAGE\", \"password\": \"${{ secrets.WMB_PASSWORD }}\", \"colourcode\": 3}" https://convos.findlayis.me/wmb/message
       if: success()
     - name: Notify IRC Failure
       run: |
         export COMMIT_MSG=$(git log -1 --pretty=%B)
-        export MESSAGE="Build of ${{ secrets.DOCKER_REPO }}:latest and ${{ secrets.DOCKER_REPO2 }}:latest failed with commit message: $COMMIT_MSG. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        export MESSAGE="Build and scan of ${{ secrets.DOCKER_REPO }}:latest and ${{ secrets.DOCKER_REPO2 }}:latest failed. Commit message: $COMMIT_MSG. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        curl -X POST -H "Content-Type: application/json" -d "{\"message\": \"$MESSAGE\", \"password\": \"${{ secrets.WMB_PASSWORD }}\", \"colourcode\": 4}" https://convos.findlayis.me/wmb/message
+      if: failure()
+
+  build-and-push:
+    needs: [build-and-scan]
+    if: github.ref == 'refs/heads/main'
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Login to Docker Repository
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ secrets.DOCKER_REGISTRY }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_REPO }}:latest
+    - name: Build the second Docker image
+      run: docker build . --file Dockerfile-GCP --tag ${{ secrets.DOCKER_REPO2 }}:latest
+    - name: Push the Docker image
+      run: docker push ${{ secrets.DOCKER_REPO }}:latest
+    - name: Push the second Docker image
+      run: docker push ${{ secrets.DOCKER_REPO2 }}:latest
+    - name: Notify IRC Success
+      run: |
+        export COMMIT_MSG=$(git log -1 --pretty=%B)
+        export MESSAGE="Build and push of ${{ secrets.DOCKER_REPO }}:latest and ${{ secrets.DOCKER_REPO2 }}:latest completed. Commit message: $COMMIT_MSG. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        curl -X POST -H "Content-Type: application/json" -d "{\"message\": \"$MESSAGE\", \"password\": \"${{ secrets.WMB_PASSWORD }}\", \"colourcode\": 3}" https://convos.findlayis.me/wmb/message
+      if: success()
+    - name: Notify IRC Failure
+      run: |
+        export COMMIT_MSG=$(git log -1 --pretty=%B)
+        export MESSAGE="Build and push of ${{ secrets.DOCKER_REPO }}:latest and ${{ secrets.DOCKER_REPO2 }}:latest failed. Commit message: $COMMIT_MSG. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         curl -X POST -H "Content-Type: application/json" -d "{\"message\": \"$MESSAGE\", \"password\": \"${{ secrets.WMB_PASSWORD }}\", \"colourcode\": 4}" https://convos.findlayis.me/wmb/message
       if: failure()
