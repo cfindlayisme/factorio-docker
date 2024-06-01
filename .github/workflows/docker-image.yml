@@ -82,23 +82,33 @@ jobs:
         registry: ${{ secrets.DOCKER_REGISTRY }}
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_REPO }}:latest
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_REPO }}:latest --tag ghcr.io/${{ github.repository }}:latest
     - name: Build the second Docker image
-      run: docker build . --file Dockerfile-GCP --tag ${{ secrets.DOCKER_REPO2 }}:latest
+      run: docker build . --file Dockerfile-GCP --tag ${{ secrets.DOCKER_REPO2 }}:latest --tag ghcr.io/${{ github.repository }}:gcp
     - name: Push the Docker image
-      run: docker push ${{ secrets.DOCKER_REPO }}:latest
+      run: |
+        docker push ${{ secrets.DOCKER_REPO }}:latest
+        docker push ghcr.io/${{ github.repository }}:latest
     - name: Push the second Docker image
-      run: docker push ${{ secrets.DOCKER_REPO2 }}:latest
+      run: |
+        docker push ${{ secrets.DOCKER_REPO2 }}:latest
+        docker push ghcr.io/${{ github.repository }}:gcp
     - name: Notify IRC Success
       run: |
         export COMMIT_MSG=$(git log -1 --pretty=%B)
-        export MESSAGE="Build and push of ${{ secrets.DOCKER_REPO }}:latest and ${{ secrets.DOCKER_REPO2 }}:latest completed. Commit message: $COMMIT_MSG. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        export MESSAGE="Build and push of ${{ secrets.DOCKER_REPO }}:latest, ${{ secrets.DOCKER_REPO2 }}:latest, ghcr.io/${{ github.repository }}:latest, and ghcr.io/${{ github.repository }}:gcp completed. Commit message: $COMMIT_MSG. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         curl -X POST -H "Content-Type: application/json" -d "{\"message\": \"$MESSAGE\", \"password\": \"${{ secrets.WMB_PASSWORD }}\", \"colourcode\": 3}" https://convos.findlayis.me/wmb/message
       if: success()
     - name: Notify IRC Failure
       run: |
         export COMMIT_MSG=$(git log -1 --pretty=%B)
-        export MESSAGE="Build and push of ${{ secrets.DOCKER_REPO }}:latest and ${{ secrets.DOCKER_REPO2 }}:latest failed. Commit message: $COMMIT_MSG. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        export MESSAGE="Build and push of ${{ secrets.DOCKER_REPO }}:latest, ${{ secrets.DOCKER_REPO2 }}:latest, ghcr.io/${{ github.repository }}:latest, and ghcr.io/${{ github.repository }}:gcp failed. Commit message: $COMMIT_MSG. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         curl -X POST -H "Content-Type: application/json" -d "{\"message\": \"$MESSAGE\", \"password\": \"${{ secrets.WMB_PASSWORD }}\", \"colourcode\": 4}" https://convos.findlayis.me/wmb/message
       if: failure()
