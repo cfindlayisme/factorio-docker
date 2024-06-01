@@ -45,7 +45,7 @@ jobs:
         exit-code: '1'
         severity: 'HIGH'
         ignore-unfixed: true
-    - name: Run Trivy vulnerability scanner on base image
+    - name: Run Trivy vulnerability scanner on GCP image
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: ${{ secrets.DOCKER_REPO2 }}:latest
