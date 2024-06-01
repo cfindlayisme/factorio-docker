@@ -41,7 +41,14 @@ jobs:
     - name: Run Trivy vulnerability scanner on base image
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ${{ secrets.DOCKER_REPO }}:latest-scan
+        image-ref: ${{ secrets.DOCKER_REPO }}:latest
+        exit-code: '1'
+        severity: 'HIGH'
+        ignore-unfixed: true
+    - name: Run Trivy vulnerability scanner on base image
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ secrets.DOCKER_REPO2 }}:latest
         exit-code: '1'
         severity: 'HIGH'
         ignore-unfixed: true
